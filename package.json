@@ -1,6 +1,6 @@
 {
     "name": "Yworkshell",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "author": "Luolei",
     "license": "ISC",
     "description": "A smart front end workflow cli tool.Still under developing",
@@ -9,7 +9,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/foru17/yworkshell.git"
+        "url": "git+https://github.com/yued-fe/yworkshell.git"
     },
     "scripts": {
         "dev": "cross-env NODE_ENV=local  gulp dev",
@@ -20,7 +20,6 @@
         "clean": "gulp clean",
         "build": "gulp clean && sleep 1  && gulp build",
         "nocombo-publish": "npm run build && sleep 1 && gulp rev && gulp rev-fix && gulp rev-views",
-        "publish": "gulp clean && sleep 1  && gulp build  && sleep 1 && gulp rev && gulp rev-fix && gulp rev-views && gulp preview-combo --useLogic && gulp copy-config",
         "publish-skip": "gulp clean && sleep 1  && gulp build  && sleep 1 && gulp rev --skipV && gulp rev-fix && gulp rev-views && gulp preview-combo  && gulp copy-config",
         "static": "gulp static-html",
         "online-view": "npm run nocombo-publish && gulp static-html --envConf  build && gulp ftp-static && gulp ftp-views",
@@ -32,7 +31,7 @@
     },
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/foru17/yworkshell/issues"
+        "url": "https://github.com/yued-fe/yworkshell/issues"
     },
     "_npmUser": {
         "name": "foru17",
