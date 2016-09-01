@@ -22,20 +22,8 @@ var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 // var prompt = require('gulp-prompt');
 
 
-
-
-
 gulp.task('auto-test', function() {
     console.log('自动测试');
-    // gulp.src('../../.yconfig')
-    //     .pipe(prompt.prompt({
-    //         type: 'checkbox',
-    //         name: 'bump',
-    //         message: 'What type of bump would you like to do?',
-    //         choices: ['patch', 'minor', 'major']
-    //     }, function(res) {
-    //         //value is in res.bump (as an array)
-    //     }));
 
 })
 

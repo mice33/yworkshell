@@ -1,9 +1,16 @@
 {
-    "name": "QidianViewsTool",
-    "version": "2.0.2",
-    "author": "Rainszhang & Luolei",
+    "name": "Yworkshell",
+    "version": "0.0.1",
+    "author": "Luolei",
     "license": "ISC",
-    "description": "Qidian Project Local Tool",
+    "description": "A smart front end workflow cli tool.Still under developing",
+    "bin": {
+        "yworkflow": "bin/yworkflow"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/foru17/yworkshell.git"
+    },
     "scripts": {
         "dev": "cross-env NODE_ENV=local  gulp dev",
         "preview": "cross-env NODE_ENV=preview  gulp dev",
@@ -19,6 +26,17 @@
         "online-view": "npm run nocombo-publish && gulp static-html --envConf  build && gulp ftp-static && gulp ftp-views",
         "online-preview": "npm run nocombo-publish && gulp static-html --envConf build --previews  && gulp ftp-static --previews && gulp ftp-views --previews",
         "publish-adv": "gulp clean && sleep 1  && gulp build  && sleep 1  && gulp rev && sleep 1 && gulp tmp-store && gulp copy-hash-map && gulp rev-fix && gulp rev-build-all && sleep 1 && gulp deps-update-all && gulp rev-fix-deps && gulp rev-views-deps && gulp rev-build-all && gulp preview-combo --useLogic && gulp clean-ana && gulp copy-config"
+    },
+    "author": {
+        "name": "@foru17 <meleilei@gmail.com>"
+    },
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/foru17/yworkshell/issues"
+    },
+    "_npmUser": {
+        "name": "foru17",
+        "email": "meleilei@gmail.com"
     },
     "devDependencies": {
         "chalk": "^1.1.1",
@@ -73,11 +91,15 @@
     "dependencies": {
         "body-parser": "~1.15.2",
         "cookie-parser": "~1.4.0",
+        "cross-spawn": "^4.0.0",
         "debug": "~2.2.0",
         "ejs": "^2.3.4",
+        "exec": "^0.2.1",
         "express": "~4.14.0",
+        "figlet": "^1.1.2",
         "gulp-prompt": "^0.2.0",
         "morgan": "^1.6.1",
+        "optimist": "^0.6.1",
         "request": "^2.67.0",
         "serve-favicon": "~2.3.0",
         "underscore": "^1.8.3",

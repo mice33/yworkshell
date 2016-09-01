@@ -2,7 +2,6 @@
  *
  * 处理精灵图片
  * Author: Luolei
- * 需要改造成gulp para
  */
 
 
@@ -11,12 +10,13 @@
 var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow/')[0];
 LOCAL_FOLDER = LOCAL_FOLDER
-// process.chdir(LOCAL_FOLDER);
+process.chdir(LOCAL_FOLDER);
 
 var path = require('path');
 var SHELL_PATH = process.env.PWD
 var YWORKFLOW_PATH = path.resolve(__dirname, '..');
-// var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
+console.log('测试路径2:' + SHELL_PATH);
+var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 var gulp = require('gulp');
 
 var del = require('del');

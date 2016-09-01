@@ -3,11 +3,15 @@
  */
 
 var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
-var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow')[0];
+var LOCAL_FOLDER = process.env.PWD;
+LOCAL_FOLDER = LOCAL_FOLDER.replace(/ /g, '\\ ');
+console.log('gulp转换路径:' + LOCAL_FOLDER);
 
-// console.log('gulp 起始路径:' + LOCAL_FOLDER);
-console.log(__dirname.split('Yworkflow')[0]);
-var PROJECT_CONFIG = require('../.yconfig'); //载入项目基础配置
+var path = require('path');
+var SHELL_PATH = process.env.PWD
+console.log('Init路径' + SHELL_PATH);
+var YWORKFLOW_PATH = path.resolve(__dirname, '..');
+// var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 
 //引入 gulp
 var gulp = require('gulp');
@@ -17,11 +21,11 @@ var pkg = require('./package.json'); // 获得配置文件中相关信息
 var plumber = require("gulp-plumber"); // 错误处理
 var chalk = require('chalk'); // 美化日志
 
+var gutil = require('gulp-util');
 
 requireDir('./gulp');
 
 // 设置相关路径
-console.log(LOCAL_FOLDER + 'src/static/**/*.js');
 var paths = {
     css: [LOCAL_FOLDER + 'src/static/**/*.scss',LOCAL_FOLDER +  'src/**/*.css'],
     js: [LOCAL_FOLDER + 'src/static/**/*.js'], // js文件相关目录
@@ -47,8 +51,10 @@ function gulpWatch() {
  */
 
 gulp.task('dev', function() {
+    console.log('启动服务');
+     var _progressPash = gutil.env.path ? gutil.env.path : '';
     nodemon({
-            script: 'Yworkflow/index.js',
+            script: '/index.js',
             ext: 'js html scss css',
             ignore: ['ejs', LOCAL_FOLDER + '_tmp', LOCAL_FOLDER + 'src', LOCAL_FOLDER +'build',LOCAL_FOLDER + '_prelease',LOCAL_FOLDER + '_previews'],
             env: {

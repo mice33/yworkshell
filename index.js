@@ -95,6 +95,7 @@ app.engine('html', require('ejs').renderFile);
 
 //node-config下的routermap.js十分重要，是线上框架机的路由依赖文件
 var routerMap = require('../src/node-config/local_dev_routermap.js');
+// var routerMap = require('../src/node-config/dynamic_routermap.js');
 
 //ajaxmap仅供本地调试用,约定好格式即可
 var ajaxMap = require('../src/json/ajaxmap.js');
@@ -335,24 +336,6 @@ app.get('/page/*',function(req,res,next){
         });
 
 })
-
-
-
-/**
- * 这里配置ejs的代理路由
- */
-
-app.get('/ejs/*',function(req,res,next){
-        console.log('====读取EJS');
-        var ejsReg = /^\/ejs\//gi;
-        var _proxyPath = req.path.replace(ejsReg,'');
-        fs.readFile( LOCAL_FOLDER + 'src/static/' + _proxyPath, function(err, data) {
-            if (err) throw err;
-            res.send(data);
-        });
-
-})
-
 
 
 /**

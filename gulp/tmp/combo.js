@@ -24,16 +24,16 @@ process.chdir(LOCAL_FOLDER)
 var path = require('path');
 var SHELL_PATH = process.env.PWD
 var YWORKFLOW_PATH = path.resolve(__dirname, '..');
-// var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
+var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 var gulp = require('gulp');
 var del = require('del');
 var combo = require('gulp-qidian-combo');
 var argv = require('yargs').argv;
 
-// var serverConf = require(SHELL_PATH + '/src/node-config/server').genConf;
+var serverConf = require(SHELL_PATH + '/src/node-config/server').genConf;
 
-// var envType = "local";
-// var staticConf = serverConf[envType]['static'];
+var envType = "local";
+var staticConf = serverConf[envType]['static'];
 var dateFormat = require('dateformat');
 var gutil = require('gulp-util');
 
@@ -44,18 +44,9 @@ var gutil = require('gulp-util');
 
 gulp.task('preview-combo', function() {
     var _useLogic = gutil.env.useLogic ? true : false;
-      var _progressPash = gutil.env.path ? gutil.env.path : '';
-
-var serverConf = require(_progressPash + '/src/node-config/server').genConf;
-
-var envType = "local";
-var staticConf = serverConf[envType]['static'];
-var PROJECT_CONFIG = require(_progressPash + '/.yconfig'); //载入项目基础配置
-
-
     var _updateTime = dateFormat((new Date()).getTime(), 'yyyymmddHHMM');
     var baseUri = '<%= staticConf.staticDomain %>/c/='; //这里设置combo的url地址
-    gulp.src(_progressPash + '/_previews/**/*.html')
+    gulp.src('_previews/**/*.html')
      .pipe(gulpSlash())
         .pipe(combo(baseUri, {
             splitter: ',',
@@ -68,7 +59,7 @@ var PROJECT_CONFIG = require(_progressPash + '/.yconfig'); //载入项目基础�
         }, {
             max_age: 31536000
         }))
-        .pipe(gulp.dest(_progressPash + '/_previews'));
+        .pipe(gulp.dest('_previews'));
 })
 
 /**
@@ -78,8 +69,6 @@ var PROJECT_CONFIG = require(_progressPash + '/.yconfig'); //载入项目基础�
 
 gulp.task('view-combo', function() {
     var _useLogic = gutil.env.useLogic ? true : false;
-      var _progressPash = gutil.env.path ? gutil.env.path : '';
-
     var _updateTime = dateFormat((new Date()).getTime(), 'yyyymmddHHMM');
     // console.log('url时间更新' + _updateTime);
     var baseUri = '<%= staticConf.staticDomain %>/c/=';

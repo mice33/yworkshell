@@ -12,7 +12,10 @@ var fs = require('fs');
 var _ = require('underscore');
 
 
-var PROJECT_CONFIG = require('../../.yconfig'); //载入项目基础配置
+var path = require('path');
+var SHELL_PATH = process.env.PWD
+var YWORKFLOW_PATH = path.resolve(__dirname, '..');
+var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 var gulp = require('gulp');
 var del = require('del');
 var gulp = require('gulp');
@@ -31,7 +34,7 @@ var gutil = require('gulp-util');
 
 
 const envType = "local"; //全局环境
-var serverConf = require('../../src/node-config/server').genConf;
+var serverConf = require(SHELL_PATH + '/src/node-config/server').genConf;
 var staticConf = serverConf[envType]['static'];
 
 
@@ -42,7 +45,7 @@ var paths = {
 };
 
 //node-config下的routermap.js十分重要，是线上框架机的路由依赖文件
-var routerMap = require('../../src/node-config/local_dev_routermap.js');
+var routerMap = require(SHELL_PATH + '/src/node-config/local_dev_routermap.js');
 
 var _osPath = __dirname;
 _osPath = gulpSlash(_osPath); // 这里处理一下windows下路径的兼容

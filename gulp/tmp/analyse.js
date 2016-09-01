@@ -4,14 +4,14 @@
  */
 var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow/')[0];
-// process.chdir(LOCAL_FOLDER)
+process.chdir(LOCAL_FOLDER)
 
 var path = require('path');
-// var SHELL_PATH = process.env.PWD;
-// SHELL_PATH = SHELL_PATH.replace(/ /g, '\\ ');
-// var YWORKFLOW_PATH = path.resolve(__dirname, '..');
-// console.log('分析SHELL:' + SHELL_PATH + '/.yconfig');
-// var PROJECT_CONFIG = require('/Volumes/Macintosh\ HD/Users/yuewen-luolei/Yuewen/Shenzhen-SVN/qidian_proj/trunk/v2' + '/.yconfig'); //载入项目基础配置
+var SHELL_PATH = process.env.PWD;
+SHELL_PATH = SHELL_PATH.replace(/ /g, '\\ ');
+var YWORKFLOW_PATH = path.resolve(__dirname, '..');
+console.log('分析SHELL:' + SHELL_PATH + '/.yconfig');
+var PROJECT_CONFIG = require('/Volumes/Macintosh\ HD/Users/yuewen-luolei/Yuewen/Shenzhen-SVN/qidian_proj/trunk/v2' + '/.yconfig'); //载入项目基础配置
 
 var gulp = require('gulp');
 var del = require('del');
@@ -323,13 +323,12 @@ gulp.task('deps-update', function(cb) {
 
 
 gulp.task('deps-update-all', function(cb) {
-    var _progressPash = gutil.env.path ? gutil.env.path : '';
     console.log(chalk.red('[Start]分析编译后的资源版本HASH变动'));
     //首先获得上一次的业务js编译后的hash值
 
-    var _lastBuildHashMap = require(_progressPash + '/hash-tag-map/rev-HashMap-last.json');
-    var _currentBuildHashMap = require(_progressPash + '/hash-tag-map/rev-HashMap.json');
-    var _currentIdMap = require(_progressPash + '/hash-tag-map/rev-verionId.json'),
+    var _lastBuildHashMap = require('../../hash-tag-map/rev-HashMap-last.json');
+    var _currentBuildHashMap = require('../../hash-tag-map/rev-HashMap.json');
+    var _currentIdMap = require('../../hash-tag-map/rev-verionId.json'),
         _currentIdMapRevert = _.invert(_currentIdMap);
 
 
@@ -343,7 +342,7 @@ gulp.task('deps-update-all', function(cb) {
 
         if (!!_lastBuildHashMap[_checkJsFileName]) {
             // console.log(chalk.green('[check]') + '文件' + _checkJsFileName);
-            //如果文件名没有变化,则比较两者的hash
+             //如果文件名没有变化,则比较两者的hash
             var _oldHash = !!_lastBuildHashMap[_checkJsFileName] ? _lastBuildHashMap[_checkJsFileName] : 00000;
             var _newHash = !!_currentBuildHashMap[_checkJsFileName] ? _currentBuildHashMap[_checkJsFileName] : 11111;
 
@@ -355,7 +354,7 @@ gulp.task('deps-update-all', function(cb) {
             }
         } else {
             // console.log('新文件');
-            // console.log(chalk.green('乌拉拉'));
+             // console.log(chalk.green('乌拉拉'));
             console.log('[Hash比较] ' + chalk.green(_oldHash) + chalk.blue(' / ') + chalk.green(_newHash) + ' 文件:' + _checkJsFileName);
             // _changedJsFiles.push(_checkJsFileName);
 
@@ -398,12 +397,12 @@ gulp.task('deps-update-all', function(cb) {
      * 接下来替换rev-verionId.json和更新rev-HashMap.json里面的版本文件
      */
 
-    //更新rev-verionid.json
+     //更新rev-verionid.json
     var _currentFileString = JSON.stringify(_currentIdMap, null, 4);
     var _updateFileString = '';
 
     //更新hash-map
-    var _currentBuildHashMapString = JSON.stringify(_currentBuildHashMap, null, 4);
+    var _currentBuildHashMapString = JSON.stringify(_currentBuildHashMap,null,4);
     var _upadteBuildHashMapString = '';
 
 
@@ -438,7 +437,7 @@ gulp.task('deps-update-all', function(cb) {
 
         _currentFileString = _currentFileString.replace(_lastId, _updateFileName);
         _currentBuildHashMapString = _currentBuildHashMapString.replace(_lastId, _updateFileName)
-        fs.renameSync(_progressPash + '/_tmp/' + _lastId, _progressPash + '/_tmp/' + _updateFileName)
+        fs.renameSync(LOCAL_FOLDER + '_tmp/' + _lastId, LOCAL_FOLDER + '_tmp/' + _updateFileName)
 
     }
 
@@ -450,7 +449,8 @@ gulp.task('deps-update-all', function(cb) {
         console.log(chalk.green('[完成]最终rev-verionId.json生成'));
     }
     // console.log(_updateFileStringBk);
-    fs.writeFileSync(_progressPash + '/hash-tag-map/rev-verionId.json', JSON.stringify(_updateFileStringBk, null, 4));
+    fs.writeFileSync(LOCAL_FOLDER + 'hash-tag-map/rev-verionId.json', JSON.stringify(_updateFileStringBk, null, 4));
+    // fs.writeFileSync(LOCAL_FOLDER + 'hash-tag-map/rev-HashMap.json', JSON.stringify(_upadteBuildHashMapString, null, 4));
 
 
 });

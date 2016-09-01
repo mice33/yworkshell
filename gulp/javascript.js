@@ -5,7 +5,10 @@ var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow/')[0];
 process.chdir(LOCAL_FOLDER);
 
-var PROJECT_CONFIG = require('../../.yconfig');
+var path = require('path');
+var SHELL_PATH = process.env.PWD
+var YWORKFLOW_PATH = path.resolve(__dirname, '..');
+// var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 var gulp = require('gulp');
 var rename = require('gulp-rename');
 var chalk = require('chalk'); //美化日志
@@ -17,12 +20,12 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var eslint = require('gulp-eslint');
 
-
+var gutil = require('gulp-util');
 
 // 设置相关路径
 var paths = {
     des: 'build',
-    js: 'src/static/**/*.js', //js文件相关目录
+    js: '/src/static/**/*.js', //js文件相关目录
 };
 
 // JS检查
@@ -35,7 +38,9 @@ gulp.task('lint', function() {
 });
 
 gulp.task('scripts', function(cb) {
-    gulp.src(paths.js)
+     var _progressPash = gutil.env.path ? gutil.env.path : '';
+     console.log('预处理的路径是:' + _progressPash);
+     gulp.src(_progressPash + paths.js)
         .pipe(gulpSlash())
         .pipe(plumber())
         .pipe(sourcemaps.init())
@@ -46,6 +51,6 @@ gulp.task('scripts', function(cb) {
         }))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
-        .pipe(gulp.dest(paths.des))
+        .pipe(gulp.dest(_progressPash + '/build'))
     cb()
 });
