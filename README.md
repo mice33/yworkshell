@@ -27,7 +27,7 @@
 
 * 下载安装
 	1. `git clone http://git.code.oa.com/qidian_proj/Qidian.git` 或者svn checkout具体的项目仓库
-	2. 进入项目文件夹目录，执行`npm install` ,若日志提示`permission denied` 权限的问题,请执行`sudo npm install`
+	2. 进入项目文件夹目录，执行`npm install -g` ,若日志提示`permission denied` 权限的问题,请执行`sudo npm install`
 
 
 ##注意
