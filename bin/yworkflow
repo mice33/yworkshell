@@ -10,7 +10,7 @@ var figlet = require('figlet');
 var exec = require('exec');
 var execSync = require('child_process').execSync;
 var path = require('path');
-var spawn = require('cross-spawn');
+var spawnSync = require('child_process').spawnSync;
 
 
 var yworkflow = require('../gulpfile.js'),
@@ -40,32 +40,15 @@ var YWORKFLOW_PATH = path.resolve(__dirname, '..');
 SHELL_PATH = SHELL_PATH.replace(/ /g, '\\ ');
 YWORKFLOW_PATH = YWORKFLOW_PATH.replace(/ /g, '\\ ');
 
-
-
 console.log(argv);
 console.log(chalk.blue('当前处理路径:') + chalk.red(SHELL_PATH));
 console.log('yworkflow模块路径:' + YWORKFLOW_PATH);
 
-
-if (argv.test) {
-	console.log('SHOW');
-	console.log(process.env.PWD);
-
-	execSync('cd ' + YWORKFLOW_PATH + '&& npm run sprite --path ' + SHELL_PATH, function(err, out, code) {
-		if (err instanceof Error)
-			throw err;
-		process.stderr.write(err);
-		process.stdout.write(out);
-		process.exit(code);
-
-	});
-
-	console.log('执行精灵图生成');
-
-}
-
-
-
+/**
+ * 显示版本信息
+ * @param  {[type]} argv.version [description]
+ * @return {[type]}              [description]
+ */
 if (argv.version) {
 	figlet(require('../package.json').version, function(err, data) {
 		if (err) {
@@ -81,6 +64,11 @@ if (argv.version) {
 }
 
 
+/**
+ *显示yworkflow说明
+ * @param  {[type]} argv.help [description]
+ * @return {[type]}           [description]
+ */
 if (argv.help) {
 	figlet('Yworkflow', function(err, data) {
 		if (err) {
@@ -111,12 +99,17 @@ if (argv.sprite) {
 }
 
 
+/**
+ * 启动当前目录的yworkflow本地服务
+ * @param  {[type]} argv.server [description]
+ * @return {[type]}             [description]
+ */
 if (argv.server) {
 	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
 	console.log('项目路径是:' + _progressPath);
 	console.log('执行本地模拟服务');
 	//执行js编译
-	exec('cd ' + YWORKFLOW_PATH + '&& cross-env NODE_ENV=local  gulp dev --path ' + _progressPath, function(err, out, code) {
+	exec('cd ' + YWORKFLOW_PATH + '&& cross-env NODE_ENV=local  && echo $NODE_ENV && gulp dev --path ' + _progressPath, function(err, out, code) {
 		if (err instanceof Error)
 			throw err;
 		console.log(out);
@@ -186,11 +179,6 @@ if (argv.publish) {
 	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
 	var _skipReversion = !!(argv['skipV']) ? true : false;
 
-	execSync('yworkflow --clean');
-	console.log('要处理的publish路径是' + _progressPath);
-	console.log('cd ' + YWORKFLOW_PATH + '&& gulp rev --path ' + _progressPath);
-	//首先reversion静态资源
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev --path ' + _progressPath);
 	//备份个初始的静态资源,做二次替换母体用
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp tmp-store --path ' + _progressPath);
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-hash-map --path ' + _progressPath);
@@ -200,10 +188,10 @@ if (argv.publish) {
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-fix-deps --path ' + _progressPath);
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views-deps --path ' + _progressPath);
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp preview-combo --useLogic --path ' + _progressPath);
-	console.log('清理文件啦');
+	// console.log('清理文件啦');
 	// execSync('cd ' + _progressPath + '&& yworkflow --clean ' + _progressPath);
 	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-config --path ' + _progressPath);
-	//第一次版本替换模板
-	// execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views --path ' + _progressPath);
+	第一次版本替换模板
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views --path ' + _progressPath);
 
 }
