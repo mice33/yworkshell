@@ -54,11 +54,12 @@ gulp.task('dev', function() {
     console.log('启动服务');
      var _progressPash = gutil.env.path ? gutil.env.path : '';
     nodemon({
-            script: '/index.js',
+            script: '../index.js',
             ext: 'js html scss css',
             ignore: ['ejs', _progressPash + '/_tmp', LOCAL_FOLDER + '/src', LOCAL_FOLDER +'/build',LOCAL_FOLDER + '/_prelease',LOCAL_FOLDER + '/_previews'],
             env: {
-                "NODE_ENV": process.env.NODE_ENV
+                // "NODE_ENV": process.env.NODE_ENV
+                 "NODE_ENV": 'local'
             }
         })
         .on('start', function() {

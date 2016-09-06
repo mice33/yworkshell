@@ -8,7 +8,7 @@ var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 
 var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow')[0];
 process.chdir(LOCAL_FOLDER)
-var PROJECT_CONFIG = require('../.yconfig'); //载入项目基础配置
+// var PROJECT_CONFIG = require('../.yconfig'); //载入项目基础配置
 
 
 var express = require('express');
@@ -32,7 +32,6 @@ var staticConf = serverConf[envType]['static'];
 
 //域名别名，在本地环境读取实际目录用
 var domainAlias = require('../src/node-config/domain_alias')
-
 var renderExtends = require('../src/node-config/extends/loader.js')
 console.log(renderExtends);
 app.use(function(req,res,next){

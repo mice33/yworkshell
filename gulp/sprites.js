@@ -2,7 +2,6 @@
  *
  * 处理精灵图片
  * Author: Luolei
- * 需要改造成gulp para
  */
 
 
@@ -11,12 +10,11 @@
 var gulpSlash = require('gulp-slash'); //处理windows和unix文件夹斜杠
 var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow/')[0];
 LOCAL_FOLDER = LOCAL_FOLDER
-// process.chdir(LOCAL_FOLDER);
+process.chdir(LOCAL_FOLDER);
 
 var path = require('path');
 var SHELL_PATH = process.env.PWD
 var YWORKFLOW_PATH = path.resolve(__dirname, '..');
-// var PROJECT_CONFIG = require(SHELL_PATH + '/.yconfig'); //载入项目基础配置
 var gulp = require('gulp');
 
 var del = require('del');
@@ -35,13 +33,60 @@ var imageResize = require('gulp-image-resize');
 var vinylPaths = require('vinyl-paths');
 var buffer = require('vinyl-buffer');
 var folders = require('gulp-folders');
+var gutil = require('gulp-util');
 
 var PATHS = {
-    spritesOriginalFiles: LOCAL_FOLDER + 'src/**/*/sprites/**/*.{png,PNG}'
+    spritesOriginalFiles: '/src/**/*/sprites/**/*.{png,PNG}'
 }
 
 
-var spritesFolder = [];
+function getSpritesFolder(progressPath,cb) {
+
+    console.log('分析路径:' + progressPath);
+    console.log('分析精灵文件夹');
+    var _currentFolderPath = progressPath;
+    _srcFolderPath = progressPath + '/src/static';
+    console.log(progressPath + PATHS.spritesOriginalFiles);
+
+
+    gulp.task('SpriteG1',function(){
+
+    })
+
+      return gulp.src(progressPath + PATHS.spritesOriginalFiles)
+        .pipe(plumber())
+        .pipe(gulpSlash())
+        .pipe(vinylPaths(function(paths) {
+            var _relativeFilePath = paths.replace(_srcFolderPath, '');
+            var _thisFileName = _relativeFilePath.split('/').pop();
+            _relativeSpriteFolder = _relativeFilePath.replace('sprites/' + _thisFileName, '');
+            if (spritesFolder.indexOf(_relativeSpriteFolder) == -1) {
+                spritesFolder.push(_relativeSpriteFolder);
+            }
+
+            // return spritesFolder;
+        })).on('end',function(){
+            console.log('结束分析');
+            console.log('需要生成精灵图的文件夹包含:' + spritesFolder);
+        })
+
+}
+
+
+
+
+
+gulp.task('smart-sprite', function() {
+    var spritesFolder = [];
+    var _progressPash = gutil.env.path ? gutil.env.path : '';
+    console.log('执行自动生成精灵图');
+    getSpritesFolder(_progressPash);
+
+})
+
+
+
+
 
 
 gulp.task('get-sprites-folder', function(cb) {
@@ -124,7 +169,7 @@ gulp.task('standard-sprites-build', ['get-sprites-folder', 'retina-sprites-build
                 width: '50%'
             }))
             .pipe(rename('@1x.png'))
-            .pipe(gulp.dest( spritesFolder[i] + '/sprite'))
+            .pipe(gulp.dest(spritesFolder[i] + '/sprite'))
 
 
 
