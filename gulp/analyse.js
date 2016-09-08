@@ -7,11 +7,6 @@ var LOCAL_FOLDER = gulpSlash(__dirname).split('Yworkflow/')[0];
 // process.chdir(LOCAL_FOLDER)
 
 var path = require('path');
-// var SHELL_PATH = process.env.PWD;
-// SHELL_PATH = SHELL_PATH.replace(/ /g, '\\ ');
-// var YWORKFLOW_PATH = path.resolve(__dirname, '..');
-// console.log('分析SHELL:' + SHELL_PATH + '/.yconfig');
-// var PROJECT_CONFIG = require('/Volumes/Macintosh\ HD/Users/yuewen-luolei/Yuewen/Shenzhen-SVN/qidian_proj/trunk/v2' + '/.yconfig'); //载入项目基础配置
 
 var gulp = require('gulp');
 var del = require('del');
@@ -33,6 +28,7 @@ var concat = require('gulp-concat');
 var madge = require('madge');
 var fs = require('fs');
 var _ = require('lodash');
+
 
 
 
@@ -336,10 +332,8 @@ gulp.task('deps-update-all', function(cb) {
     //创建一个临时数据储存变化了的js名
     var _changedJsFiles = [],
         _changedJsSourceFiles = [];
-
     for (var i = 0; i < Object.keys(_currentBuildHashMap).length; i++) {
         var _checkJsFileName = Object.keys(_currentBuildHashMap)[i];
-
 
         if (!!_lastBuildHashMap[_checkJsFileName]) {
             // console.log(chalk.green('[check]') + '文件' + _checkJsFileName);
@@ -354,9 +348,10 @@ gulp.task('deps-update-all', function(cb) {
                 _changedJsFiles.push(_checkJsFileName);
             }
         } else {
+            console.log('[新文件]' + _checkJsFileName);
             // console.log('新文件');
             // console.log(chalk.green('乌拉拉'));
-            console.log('[Hash比较] ' + chalk.green(_oldHash) + chalk.blue(' / ') + chalk.green(_newHash) + ' 文件:' + _checkJsFileName);
+            // console.log('[Hash比较] ' + chalk.green(_oldHash) + chalk.blue(' / ') + chalk.green(_newHash) + ' 文件:' + _checkJsFileName);
             // _changedJsFiles.push(_checkJsFileName);
 
         }

@@ -16,7 +16,6 @@ var YWORKFLOW_PATH = path.resolve(__dirname, '..');
 
 
 var gulp = require('gulp');
-var del = require('del');
 var gulp = require('gulp');
 var del = require('del');
 var chalk = require('chalk'); // 美化日志
@@ -28,7 +27,7 @@ var RevAll = require('gulp-rev-custom-tag');
 var revReplace = require('gulp-rev-replace');
 var bust = require('gulp-buster');
 var gulpCopy = require('gulp-copy');
-
+var execSync = require('child_process').execSync;
 
 
 
@@ -208,7 +207,9 @@ gulp.task('rev-views', function(cb) {
 
 gulp.task('rev-fix-deps', function() {
       var _progressPash = gutil.env.path ? gutil.env.path : '';
-     del([_progressPash + '/_prelease/**/*'])
+      _progressPash = _progressPash.replace(/ /g, '\\ ');
+     // del([_progressPash + '/_prelease/**/*'])
+     var _thisCleanTask = execSync('cd ' + _progressPash + ' && del -f ' + '_prelease/**/*');
     var manifest = gulp.src(_progressPash + "/hash-tag-map/rev-verionId.json");
     return gulp.src([_progressPash + '/_tmp/**']) // Minify any CSS sources
         .pipe(gulpSlash())

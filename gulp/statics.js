@@ -44,10 +44,6 @@ function imageOptimize() {
 
 }
 
-
-
-
-
 // sass task
 gulp.task('images', function(cb) {
     var _progressPash = gutil.env.path ? gutil.env.path : '';
@@ -69,12 +65,17 @@ gulp.task('images-copy', function(cb) {
     cb();
 });
 
+
+/**
+ * 复制src文件夹所有的非css和js到build文件夹
+ * @param  {[type]} cb) {               console.log('[gulp task] sfile start');    var _progressPash [description]
+ * @return {[type]}     [description]
+ */
 gulp.task('sfile', function(cb) {
     console.log('[gulp task] sfile start');
     var _progressPash = gutil.env.path ? gutil.env.path : '';
-    console.log(_progressPash);
-    console.log('OUTPUT:' +_progressPash + paths.build);
-    gulp.src([_progressPash + '/src/static/**/*', '/!src/static/**/*.{css,scss,js}', '/!src/static/**/sprites', '/!src/static/**/sprites/**'])
+    _progressPash = _progressPash.replace(/ /g, '\\ ') + '/';
+    gulp.src([_progressPash + '/src/static/**/*', '!' + _progressPash + '/src/static/**/*.{css,scss,js}', '!' + _progressPash +  '/src/static/**/sprites', '!' + _progressPash +  '/src/static/**/sprites/**'])
         .pipe(gulpSlash())
         .pipe(gulp.dest(_progressPash + paths.build))
     cb();

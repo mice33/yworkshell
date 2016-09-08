@@ -21,8 +21,7 @@ _html/
 # Node Modules (use `npm install` to generate these)
 node_modules/*
 node_modules
-../*
-
+output.log
 
 # OS X Junk
 .DS_Store

@@ -35,52 +35,106 @@ var buffer = require('vinyl-buffer');
 var folders = require('gulp-folders');
 var gutil = require('gulp-util');
 
+var YOPTIONS = require('./argvs');
+
+
+
+
 var PATHS = {
     spritesOriginalFiles: '/src/**/*/sprites/**/*.{png,PNG}'
 }
 
 
-function getSpritesFolder(progressPath,cb) {
-
-    console.log('分析路径:' + progressPath);
-    console.log('分析精灵文件夹');
-    var _currentFolderPath = progressPath;
-    _srcFolderPath = progressPath + '/src/static';
-    console.log(progressPath + PATHS.spritesOriginalFiles);
+function getSpritesFolder(progressPath) {
 
 
-    gulp.task('SpriteG1',function(){
-
-    })
-
-      return gulp.src(progressPath + PATHS.spritesOriginalFiles)
-        .pipe(plumber())
-        .pipe(gulpSlash())
-        .pipe(vinylPaths(function(paths) {
-            var _relativeFilePath = paths.replace(_srcFolderPath, '');
-            var _thisFileName = _relativeFilePath.split('/').pop();
-            _relativeSpriteFolder = _relativeFilePath.replace('sprites/' + _thisFileName, '');
-            if (spritesFolder.indexOf(_relativeSpriteFolder) == -1) {
-                spritesFolder.push(_relativeSpriteFolder);
-            }
-
-            // return spritesFolder;
-        })).on('end',function(){
-            console.log('结束分析');
-            console.log('需要生成精灵图的文件夹包含:' + spritesFolder);
-        })
 
 }
+
+
+/**
+ * 生成高清图文件
+ * @return {[type]} [description]
+ */
+function retinaSpritesBuild(progressPath) {
+
+}
+
 
 
 
 
 
 gulp.task('smart-sprite', function() {
-    var spritesFolder = [];
+
     var _progressPash = gutil.env.path ? gutil.env.path : '';
+    console.log(chalk.red('[处理]' + _progressPash));
+
     console.log('执行自动生成精灵图');
-    getSpritesFolder(_progressPash);
+    var progressPath = _progressPash.replace(/ /g, '\\ ');
+  // var PROJECT_CONFIG = require(progressPath + '/.yconfig');
+    var spritesFolder = [];
+    // console.log('分析路径:' + progressPath);
+    console.log('分析精灵文件夹');
+    var _currentFolderPath = progressPath;
+    _srcFolderPath = progressPath + '/src/static';
+    console.log(progressPath + PATHS.spritesOriginalFiles);
+
+
+
+    function taskAna(cb) {
+        console.log('分析目录 Start');
+       return gulp.src(progressPath + PATHS.spritesOriginalFiles)
+            .pipe(plumber())
+            .pipe(gulpSlash())
+            .pipe(vinylPaths(function(paths) {
+                var _relativeFilePath = paths.replace(_srcFolderPath, '');
+                var _thisFileName = _relativeFilePath.split('/').pop();
+                _relativeSpriteFolder = _relativeFilePath.replace('sprites/' + _thisFileName, '');
+                if (spritesFolder.indexOf(_relativeSpriteFolder) == -1) {
+                    spritesFolder.push(_relativeSpriteFolder);
+                }
+                console.log(spritesFolder);
+                taskRetina()
+            }))
+        console.log('分析目录 End');
+    }
+
+    function taskRetina(cb) {
+        console.log('创建高清 Start');
+        var _totalSpritesToGenerateSize = spritesFolder.length;
+        console.log(chalk.green('【精灵图】共有 ') + chalk.red(_totalSpritesToGenerateSize) + chalk.green(' 张@2x精灵图待生成'));
+        var i = 0;
+        var spriteData = [],
+            spriteDataResize = [];
+        for (i; i < _totalSpritesToGenerateSize; i++) {
+            console.log(spritesFolder[i] + 'sprites/*.png');
+            var _thisSpriteMaster = spritesFolder[i].split('/').slice(0, spritesFolder[i].split('/').length - 1).pop();
+                        spritesFolder[i] = spritesFolder[i].replace(/ /g, '\\ ');
+            console.log('精灵图路径:' + spritesFolder[i] + 'sprites/*.png');
+
+            spriteData[i] = gulp.src(spritesFolder[i] + 'sprites/*.png')
+                .pipe(gulpSlash())
+                .pipe(spritesmith({
+                    imgName: '@2x.png',
+                    cssName: _thisSpriteMaster + '_sprite.scss',
+                    algorithm: 'binary-tree',
+                    padding: 4,
+                    cssFormat: 'scss'
+                }));
+            var spriteRetina = spriteData[i].img,
+                spriteResize = spriteData[i].img;
+            var spriteCss = spriteData[i].css;
+
+            console.log('[OUTPUT]'  + spritesFolder[i] + '/sprite');
+            var retianStream = spriteRetina.pipe(spritesFolder[i] + '/sprite');
+
+            var cssStream = spriteCss.pipe(gulp.dest(progressPath + '/src/static/qd/css'));
+
+        }
+        console.log('高清 End');
+    }
+    taskAna();
 
 })
 
@@ -120,6 +174,7 @@ gulp.task('get-sprites-folder', function(cb) {
  */
 
 gulp.task('retina-sprites-build', ['get-sprites-folder'], function(cb) {
+    console.log(YOPTIONS);
     var _totalSpritesToGenerateSize = spritesFolder.length;
     console.log(chalk.green('【精灵图】共有 ') + chalk.red(_totalSpritesToGenerateSize) + chalk.green(' 张@2x精灵图待生成'));
     var i = 0;

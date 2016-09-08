@@ -3,7 +3,7 @@
 'use strict';
 
 process.title = 'yworkflow';
-
+var YworkConfig = require('../.ywork');
 var gulpSlash = require('gulp-slash');
 var chalk = require('chalk');
 var figlet = require('figlet');
@@ -23,12 +23,13 @@ var yworkflow = require('../gulpfile.js'),
 	.alias('sp', 'sprite')
 	.alias('bd', 'build')
 	.alias('cl', 'clean')
+	.alias('gl', 'gulp')
 	.describe(chalk.green('init'), ':生成模板文件夹和配置文件')
 	.describe(chalk.green('sprite'), ':生成项目精灵图')
 	.describe(chalk.green('build'), ':编译资源')
 	.describe(chalk.green('publish'), ':生成静态资源和模板')
 	.describe(chalk.green('ftp'), ':发布到内网ftp服务器预览')
-
+	.describe(chalk.green('gulp'), ':显示yworkflow所涉及的所有gulp任务')
 
 var argv = optimist.argv;
 var text = argv._.join(' ');
@@ -40,9 +41,14 @@ var YWORKFLOW_PATH = path.resolve(__dirname, '..');
 SHELL_PATH = SHELL_PATH.replace(/ /g, '\\ ');
 YWORKFLOW_PATH = YWORKFLOW_PATH.replace(/ /g, '\\ ');
 
+
+/**
+ * 载入一些ywork的配置
+ */
+var LOGPATH = YworkConfig.logPath.gulp;
+
 console.log(argv);
-console.log(chalk.blue('当前处理路径:') + chalk.red(SHELL_PATH));
-console.log('yworkflow模块路径:' + YWORKFLOW_PATH);
+console.log(YworkConfig.logPath.gulp);
 
 /**
  * 显示版本信息
@@ -50,6 +56,10 @@ console.log('yworkflow模块路径:' + YWORKFLOW_PATH);
  * @return {[type]}              [description]
  */
 if (argv.version) {
+
+	console.log(path.parse(__dirname + './index.js'));
+
+
 	figlet(require('../package.json').version, function(err, data) {
 		if (err) {
 			console.log('Something went wrong...');
@@ -69,7 +79,7 @@ if (argv.version) {
  * @param  {[type]} argv.help [description]
  * @return {[type]}           [description]
  */
-if (argv.help) {
+if (argv.help || !!text) {
 	figlet('Yworkflow', function(err, data) {
 		if (err) {
 			console.log('Something went wrong...');
@@ -83,7 +93,7 @@ if (argv.help) {
 
 
 /**
- * 生成精灵兔
+ * 生成精灵图
  * @param  {[type]} argv.sprite [description]
  * @return {[type]}             [description]
  */
@@ -92,7 +102,21 @@ if (argv.sprite) {
 	console.log('执行精灵图生成');
 	exec('cd ' + YWORKFLOW_PATH + '&& gulp smart-sprite --path ' + _progressPath, function(err, out, code) {
 		if (err instanceof Error)
-			throw err;
+			console.log(err);
+		process.stderr.write(err);
+		process.stdout.write(out);
+		process.exit(code);
+	});
+}
+
+
+if (argv.sptest) {
+	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
+	console.log('执行精灵图生成');
+	console.log('cd ' + YWORKFLOW_PATH + '&& gulp auto-sprite --path ' + _progressPath);
+	exec('cd ' + YWORKFLOW_PATH + '&& gulp auto-sprite --path ' + _progressPath, function(err, out, code) {
+		if (err instanceof Error)
+			console.log(err);
 		process.stderr.write(err);
 		process.stdout.write(out);
 		process.exit(code);
@@ -130,17 +154,15 @@ if (argv.clean) {
 	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
 	console.log('要处理的路径是' + _progressPath);
 	console.log('执行文件清理');
-
 	console.log(chalk.green('[shell] cd ' + YWORKFLOW_PATH + ' && del  -f  ' + _progressPath));
 
 	var toCleanPath = ['build/', '_prelease/', '_previews/', '_tmp/'];
-
 	var _cleanPathLength = toCleanPath.length;
 	for (var i = 0; i < _cleanPathLength; i++) {
 		var _thisPath = toCleanPath[i];
-		console.log(_progressPath + '/' + _thisPath);
+		console.log('[清理]' + _progressPath + '/' + _thisPath);
 		var _thisCleanTask = execSync('cd ' + YWORKFLOW_PATH + ' && del -f ' + _progressPath + '/' + _thisPath);
-		console.log(_thisCleanTask.toString());
+		// console.log(_thisCleanTask.toString());
 	}
 }
 
@@ -152,26 +174,39 @@ if (argv.clean) {
 if (argv.build) {
 	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
 	console.log('要处理的路径是' + _progressPath);
+	console.log('cp -rf ' + _progressPath + '/src/static/** ' + _progressPath + '/build');
+	exec('cp -rf ' + _progressPath + '/src/static/** ' + _progressPath + '/build && find build -type f \( -name "*.scss" -o -name "*.js" -o -name "*.ejs" \) -delete' + ' | tee ' + LOGPATH, function(err, out, code) {
+		if (err instanceof Error)
+			console.log(err);
+		// console.log(out);
+		console.log('assets progress');
+
+
+	});
+
+
 	console.log('执行js编译');
 	//执行js编译
-	exec('cd ' + YWORKFLOW_PATH + '&& gulp scripts --path ' + _progressPath, function(err, out, code) {
-		if (err instanceof Error)
-			throw err;
-		process.stdout.write(out);
-		// console.log('js ing');
-	});
-	//执行css编译
-	exec('cd ' + YWORKFLOW_PATH + '&& gulp sass --path ' + _progressPath, function(err, out, code) {
-		if (err instanceof Error)
-			throw err;
-		console.log('css ing');
-	});
+
+		exec('cd ' + YWORKFLOW_PATH + '&& gulp scripts --path ' + _progressPath + ' | tee ' + LOGPATH, function(err, out, code) {
+			if (err instanceof Error)
+				throw err;
+			// process.stdout.write(out);
+			console.log('js progress');
+		});
+		//执行css编译
+		exec('cd ' + YWORKFLOW_PATH + '&& gulp sass --path ' + _progressPath + ' | tee ' + LOGPATH, function(err, out, code) {
+			if (err instanceof Error)
+				throw err;
+			// console.log('css progress');
+		});
+
 	//执行静态资源拷贝
-	exec('cd ' + YWORKFLOW_PATH + '&& gulp sfile --path ' + _progressPath, function(err, out, code) {
+	exec('cd ' + YWORKFLOW_PATH + '&& gulp sfile --path ' + _progressPath + ' | tee ' + LOGPATH, function(err, out, code) {
 		if (err instanceof Error)
 			throw err;
 		// console.log(out);
-		console.log('images ing');
+		console.log('assets progress');
 	});
 
 }
@@ -186,21 +221,23 @@ if (argv.publish) {
 	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
 	var _skipReversion = !!(argv['skipV']) ? true : false;
 
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev --path ' + _progressPath);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev --path ' + _progressPath + ' | tee ' + LOGPATH);
 	//备份个初始的静态资源,做二次替换母体用
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp tmp-store --path ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-hash-map --path ' + _progressPath);
-	//接下来进行二次替换
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-build-all --path ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp deps-update-all --path ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-fix-deps --path ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views-deps --path ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp preview-combo --useLogic --path ' + _progressPath);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp tmp-store --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-hash-map --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	// //接下来进行二次替换
+		execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-fix --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-build-all --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp deps-update-all --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-fix-deps --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views-deps --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp preview-combo --useLogic --path ' + _progressPath + ' |  tee ' + LOGPATH);
 
-	// execSync('cd ' + _progressPath + '&& yworkflow --clean ' + _progressPath);
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-config --path ' + _progressPath);
+	// // execSync('cd ' + _progressPath + '&& yworkflow --clean ' + _progressPath);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp copy-config --path ' + _progressPath + ' |  tee ' + LOGPATH);
 	//第一次版本替换模板
-	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views --path ' + _progressPath);
+	execSync('cd ' + YWORKFLOW_PATH + '&& gulp rev-views --path ' + _progressPath + ' |  tee ' + LOGPATH);
+	execSync('cp -rf ' + _progressPath + '/_prelease/** /Users/yuewen-luolei/Desktop/gtimg' + ' |  tee ' + LOGPATH);
 
 }
 
@@ -240,5 +277,20 @@ if (argv.git) {
 			throw err;
 		process.stdout.write(out);
 		// console.log('js ing');
+	});
+}
+
+/**
+ * 显示yworkflow所调用的所有gulp任务
+ * @param  {[type]} argv.gulp [description]
+ * @return {[type]}           [description]
+ */
+if (argv.gulp) {
+	var _progressPath = !!(argv['path']) ? argv['path'] : SHELL_PATH
+	exec('cd ' + YWORKFLOW_PATH + '&& gulp help ', function(err, out, code) {
+		if (err instanceof Error)
+			console.log(err);
+		// process.stdout.write(out);
+		console.log(out);
 	});
 }
